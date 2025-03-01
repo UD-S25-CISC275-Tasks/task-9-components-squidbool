@@ -67,21 +67,30 @@ export function removeQuestion(questions: Question[], id: number): Question[] {
  * questions, as an array.
  */
 export function getNames(questions: Question[]): string[] {
-    return [];
+    let namesArr: string[] = questions.map((question: Question): string => question.name);
+    return namesArr;
 }
 
 /***
  * Consumes an array of questions and returns the sum total of all their points added together.
  */
 export function sumPoints(questions: Question[]): number {
-    return 0;
+    let sum: number = 0;
+    questions.forEach((question: Question): void => {sum += question.points});
+    return sum;
 }
 
 /***
  * Consumes an array of questions and returns the sum total of the PUBLISHED questions.
  */
 export function sumPublishedPoints(questions: Question[]): number {
-    return 0;
+    let sum: number = 0;
+    questions.forEach((question: Question): void => {
+        if (question.published) {
+            sum += question.points
+        }
+    });
+    return sum;
 }
 
 /***
@@ -102,7 +111,11 @@ id,name,options,points,published
  * Check the unit tests for more examples!
  */
 export function toCSV(questions: Question[]): string {
-    return "";
+    let csvStr: string = "id,name,options,points,published\n";
+    let questionsStrArr: string[] = questions.map((question: Question): string => {
+        return `${question.id},${question.name},${question.options.length},${question.points},${question.published}`
+    });
+    return csvStr + questionsStrArr.join('\n');
 }
 
 /**
