@@ -6,7 +6,11 @@ import { Question, QuestionType } from "./interfaces/question";
  * that are `published`.
  */
 export function getPublishedQuestions(questions: Question[]): Question[] {
-    return [];
+    let publishedQuestions: Question[] = questions.filter((question: Question): boolean => question.published);
+    publishedQuestions = publishedQuestions.map((question: Question): Question => {
+        return {...question, options: [...question.options]};
+    });
+    return publishedQuestions;
 }
 
 /**
@@ -15,7 +19,19 @@ export function getPublishedQuestions(questions: Question[]): Question[] {
  * `expected`, and an empty array for its `options`.
  */
 export function getNonEmptyQuestions(questions: Question[]): Question[] {
-    return [];
+    let nonEmptyQuestions: Question[] = questions.filter((question: Question): boolean => {
+        if (question.body !== "" && question.expected !== "" && question.options.length !== 0) {
+            return true;
+        } else {
+            return false;
+        }
+    });
+
+    nonEmptyQuestions = nonEmptyQuestions.map((question: Question): Question => {
+        return {...question, options: [...question.options]};
+    });
+
+    return nonEmptyQuestions;
 }
 
 /***
@@ -26,7 +42,12 @@ export function findQuestion(
     questions: Question[],
     id: number
 ): Question | null {
-    return null;
+    let foundQuestion: Question[] = questions.filter((question: Question): boolean => question.id === id)
+    if (foundQuestion.length > 0) {
+        return {...foundQuestion[0], options: [...foundQuestion[0].options]};
+    } else {
+        return null;
+    }
 }
 
 /**
@@ -34,7 +55,11 @@ export function findQuestion(
  * with the given `id`.
  */
 export function removeQuestion(questions: Question[], id: number): Question[] {
-    return [];
+    let removedQuestions: Question[] = questions.filter((question: Question): boolean => question.id !== id);
+    removedQuestions = removedQuestions.map((question: Question): Question => {
+        return {...question, options: [...question.options]};
+    });
+    return removedQuestions;
 }
 
 /***
