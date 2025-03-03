@@ -19,7 +19,12 @@ export function getPublishedQuestions(questions: Question[]): Question[] {
  * `expected`, and an empty array for its `options`.
  */
 export function getNonEmptyQuestions(questions: Question[]): Question[] {
-    let nonEmptyQuestions: Question[] = questions.filter((question: Question): boolean => {
+    let clonedQuestions: Question[] = questions.map((question: Question): Question => {
+        let deepCopy: Question = {...question, options: [...question.options]};
+        return deepCopy;
+    });
+
+    let nonEmptyQuestions: Question[] = clonedQuestions.filter((question: Question): boolean => {
         if (question.body !== "" && question.expected !== "" && question.options.length !== 0) {
             return true;
         } else {
@@ -27,10 +32,12 @@ export function getNonEmptyQuestions(questions: Question[]): Question[] {
         }
     });
 
+    /*
     nonEmptyQuestions = nonEmptyQuestions.map((question: Question): Question => {
-        return {...question, options: [...question.options]};
+        let deepCopy: Question = {...question, options: [...question.options]};
+        return deepCopy;
     });
-
+    */
     return nonEmptyQuestions;
 }
 
@@ -124,7 +131,11 @@ export function toCSV(questions: Question[]): string {
  * making the `text` an empty string, and using false for both `submitted` and `correct`.
  */
 export function makeAnswers(questions: Question[]): Answer[] {
-    return [];
+    let answersArr: Answer[] = questions.map((question: Question): Answer => {
+        let answer: Answer = {questionId: question.id, text: "", submitted: false, correct: false};
+        return answer;
+    });
+    return answersArr;
 }
 
 /***
@@ -132,7 +143,11 @@ export function makeAnswers(questions: Question[]): Answer[] {
  * each question is now published, regardless of its previous published status.
  */
 export function publishAll(questions: Question[]): Question[] {
-    return [];
+    let allPublished: Question[] = questions.map((question: Question): Question => {
+        let publishQuestion: Question = {...question, options: [...question.options], published: true};
+        return publishQuestion;
+    });
+    return allPublished;
 }
 
 /***
@@ -140,7 +155,13 @@ export function publishAll(questions: Question[]): Question[] {
  * are the same type. They can be any type, as long as they are all the SAME type.
  */
 export function sameType(questions: Question[]): boolean {
-    return false;
+    if(questions.every((question: Question): boolean => question.type === "short_answer_question")) {
+        return true;
+    } else if(questions.every((question: Question): boolean => question.type === "multiple_choice_question")) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 /***
