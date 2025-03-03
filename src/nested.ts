@@ -1,5 +1,6 @@
 import { Answer } from "./interfaces/answer";
 import { Question, QuestionType } from "./interfaces/question";
+import { duplicateQuestion, makeBlankQuestion } from "./objects";
 
 /**
  * Consumes an array of questions and returns a new array with only the questions
@@ -19,25 +20,16 @@ export function getPublishedQuestions(questions: Question[]): Question[] {
  * `expected`, and an empty array for its `options`.
  */
 export function getNonEmptyQuestions(questions: Question[]): Question[] {
-    let clonedQuestions: Question[] = questions.map((question: Question): Question => {
-        let deepCopy: Question = {...question, options: [...question.options]};
-        return deepCopy;
-    });
+    let nonEmptyQuestions: Question[] = questions.filter((question: Question): boolean => 
+        question.body !== "" || question.expected !== "" || question.options.length !== 0
+    );
 
-    let nonEmptyQuestions: Question[] = clonedQuestions.filter((question: Question): boolean => {
-        if (question.body !== "" && question.expected !== "" && question.options.length !== 0) {
-            return true;
-        } else {
-            return false;
-        }
-    });
-
-    /*
+    
     nonEmptyQuestions = nonEmptyQuestions.map((question: Question): Question => {
         let deepCopy: Question = {...question, options: [...question.options]};
         return deepCopy;
     });
-    */
+    
     return nonEmptyQuestions;
 }
 
@@ -175,7 +167,13 @@ export function addNewQuestion(
     name: string,
     type: QuestionType
 ): Question[] {
-    return [];
+    let newQuestionArr: Question[] = questions.map((question: Question): Question => {
+        return {...question, options: [...question.options]};
+    });
+
+    newQuestionArr.push(makeBlankQuestion(id, name, type));
+
+    return newQuestionArr;
 }
 
 /***
@@ -188,7 +186,15 @@ export function renameQuestionById(
     targetId: number,
     newName: string
 ): Question[] {
-    return [];
+    let renamedQuestionArr: Question[] = questions.map((question: Question): Question => {
+        if (question.id !== targetId) {
+            return {...question, options: [...question.options]};
+        } else {
+            return {...question, options: [...question.options], name: newName};
+        }
+    });
+
+    return renamedQuestionArr;
 }
 
 /***
@@ -203,7 +209,19 @@ export function changeQuestionTypeById(
     targetId: number,
     newQuestionType: QuestionType
 ): Question[] {
-    return [];
+    let changedQuestionArr: Question[] = questions.map((question: Question): Question => {
+        if (question.id !== targetId) {
+            return {...question, options: [...question.options]};
+        } else {
+            if (question.type !== newQuestionType && question.type === "multiple_choice_question") {
+                return {...question, options: [], type: newQuestionType};
+            } else {
+                return {...question, options: [...question.options], type: newQuestionType};
+            }
+        }
+    });
+
+    return changedQuestionArr;
 }
 
 /**
@@ -222,7 +240,23 @@ export function editOption(
     targetOptionIndex: number,
     newOption: string
 ): Question[] {
-    return [];
+    let editedQuestionArr: Question[] = questions.map((question: Question): Question => {
+        if (question.id !== targetId) {
+            return {...question, options: [...question.options]};
+        } else {
+            if (targetOptionIndex === -1) {
+                let endOfOptions: Question = {...question, options: [...question.options]};
+                endOfOptions.options.push(newOption);
+                return endOfOptions;
+            } else {
+                let splicedInOptions: Question = {...question, options: [...question.options]};
+                splicedInOptions.options.splice(targetOptionIndex, 1, newOption);
+                return splicedInOptions;
+            }
+        }
+    });
+
+    return editedQuestionArr;
 }
 
 /***
@@ -236,5 +270,20 @@ export function duplicateQuestionInArray(
     targetId: number,
     newId: number
 ): Question[] {
-    return [];
+    let originalInd: number = 0;
+    let search: boolean = true;
+
+    let dupedQuestionArr: Question[] = questions.map((question: Question): Question => {
+        if (search && question.id !== targetId) {
+            originalInd++;
+        } else if (search && question.id === targetId) {
+            search = false;
+        }
+        
+        return {...question, options: [...question.options]};
+    });
+
+    dupedQuestionArr.splice(originalInd + 1, 0, duplicateQuestion(newId, dupedQuestionArr[originalInd]));
+
+    return dupedQuestionArr;
 }
