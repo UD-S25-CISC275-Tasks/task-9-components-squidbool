@@ -48,7 +48,7 @@ export function CycleHoliday(): React.JSX.Element {
         <div>
             <Button onClick={changeAlphabetically}>Advance by Alphabet</Button>
             <Button onClick={changeByDate}>Advance by Year</Button>
-            {currentHoliday.name + ": " + currentHoliday.emoji}
+            Holiday: {currentHoliday.emoji}
         </div>
     );
 }
